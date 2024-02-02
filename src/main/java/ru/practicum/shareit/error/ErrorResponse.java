@@ -9,8 +9,12 @@ public class ErrorResponse {
         this.description = description;
     }
 
-    public String getError() { return error; }
+    public String getError() {
+        return error;
+    }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 }
 
