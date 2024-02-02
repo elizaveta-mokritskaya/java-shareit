@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class ItemRepositoryImpl implements ItemRepository{
+public class ItemRepositoryImpl implements ItemRepository {
     private static List<Item> items = new ArrayList<>();
     private Long lastId = 1L;
 
@@ -52,5 +52,7 @@ public class ItemRepositoryImpl implements ItemRepository{
         return items;
     }
 
-    private Long generateItemId() { return lastId++; }
+    private Long generateItemId() {
+        return lastId++;
+    }
 }
