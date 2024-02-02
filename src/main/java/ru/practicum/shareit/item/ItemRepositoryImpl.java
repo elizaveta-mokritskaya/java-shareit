@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,15 +35,13 @@ public class ItemRepositoryImpl implements ItemRepository {
                 .filter(item -> (item.getId() == itemId) && (item.getOwner().getId() == userId)
                 )
                 .findFirst();
-        if (itemOptional.isPresent()) {
-            items.remove(itemOptional.get());
-        }
+        itemOptional.ifPresent(item -> items.remove(item));
     }
 
     @Override
     public Item getItemById(Long itemId) {
         Optional<Item> itemOptional = items.stream()
-                .filter(item -> item.getId() == itemId)
+                .filter(item -> Objects.equals(item.getId(), itemId))
                 .findFirst();
         return itemOptional.orElse(null);
     }
