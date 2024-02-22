@@ -13,9 +13,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +20,7 @@ import java.util.stream.Collectors;
 public class BookingController {
     private final BookingService bookingService;
 
-    @PostMapping()
+    @PostMapping
     public BookingOutcomeDto saveNewBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                             @Valid @RequestBody BookingIncomeDto dto) {
         log.info("Получен запрос на добавление нового бронирования '{}' пользователем '{}'", dto, userId);
@@ -45,7 +42,7 @@ public class BookingController {
         return bookingService.getBookingById(userId, bookingId);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<BookingOutcomeDto> getBookingsByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                      @RequestParam(name = "state", defaultValue = "ALL") String stateParam) {
         log.info("Получен запрос на получение " +
