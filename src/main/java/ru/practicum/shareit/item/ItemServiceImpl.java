@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.DataNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.Status;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserMapper;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,35 +23,31 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> getItems(Long userId) {
-        return repository.getAllItemByUserId(userId);
+        return repository.getAllByUserId(userId);
     }
 
     @Override
-    public Item addNewItem(Long userId, Item item) {
-        if (userId == null) {
-            throw new ValidationException("Отсутствует идентификатор пользователя");
+    public Item addNewItem(Long userId, String name, String description, Boolean available) {
+        User user = UserMapper.toUser(userService.getUserById(userId));
+        Status status;
+        if (available) {
+            status = Status.AVAILABLE;
+        } else {
+            status = Status.UNAVAILABLE;
         }
-        if (item.getName() == null || item.getName().isEmpty()) {
-            throw new ValidationException("Поле 'name' не может быть пустым.");
-        }
-        if (item.getAvailable() == null) {
-            throw new ValidationException("Отсутствует статус");
-        }
-        if (item.getDescription() == null) {
-            throw new ValidationException("Отсутствует описание");
-        }
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            throw new IllegalArgumentException("Пользователь с ID " + userId + " не найден.");
-        }
-        item.setOwner(user);
-        item.setRequest(new ItemRequest());
-        return repository.addItem(item);
+        return repository.save(new Item(
+                null,
+                name,
+                description,
+                status,
+                user,
+                null
+        ));
     }
 
     @Override
     public Item updateItem(Long userId, Long itemId, String itemName, String description, Boolean available) {
-        Item updateItem = repository.getItemById(itemId);
+        Item updateItem = repository.getById(itemId);
         if (updateItem == null) {
             throw new DataNotFoundException("По заданному Id нет предмета");
         }
@@ -63,10 +60,16 @@ public class ItemServiceImpl implements ItemService {
         if (description != null) {
             updateItem.setDescription(description);
         }
+        Status status;
         if (available != null) {
-            updateItem.setAvailable(available);
+            if (available) {
+                status = Status.AVAILABLE;
+            } else {
+                status = Status.UNAVAILABLE;
+            }
+            updateItem.setAvailable(status);
         }
-        return repository.addItem(updateItem);
+        return repository.save(updateItem);
     }
 
     @Override
@@ -75,28 +78,35 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getItemById(Long itemId) {
-        return repository.getItemById(itemId);
+    public Item getItemById(Long userId, Long itemId) {
+        if (userService.getUserById(userId) == null) {
+            throw new DataNotFoundException("Пользователь не найден.");
+        }
+        Item item = repository.findById(itemId).orElse(null);
+        if (item == null) {
+            throw new DataNotFoundException("Вещь с таким id не найдена.");
+        }
+        return item;
     }
 
     @Override
     public List<Item> getItemsByDescription(String text) {
         if (text.isEmpty()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
-        List<Item> allItems = repository.getAllItems();
-        List<Item> matchingItems = new ArrayList<>();
+        return repository.getItemsByDescription(text);
+    }
 
-        for (Item item : allItems) {
-            String itemName = item.getName();
-            String itemDescription = item.getDescription();
-            if (itemName != null && itemName.toLowerCase().contains(text.toLowerCase())
-                    || (itemDescription != null && itemDescription.toLowerCase().contains(text.toLowerCase()))
-                    && item.getAvailable()) {
-                matchingItems.add(item);
-            }
+    @Override
+    public boolean userIsOwnerOfItem(long userId, Long itemId) {
+        return userService.getUserById(userId).getId().equals(repository.getReferenceById(itemId).getOwner().getId());
+    }
+
+    @Override
+    public List<Item> findItemsByOwnerId(Long userId) {
+        if (userService.getUserById(userId) == null) {
+            throw new DataNotFoundException("Владелец вещи не найден");
         }
-
-        return matchingItems;
+        return repository.getByOwnerId(userId);
     }
 }

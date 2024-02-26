@@ -3,42 +3,41 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.exception.DataNotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
     @Override
-    public List<User> getAllUsers() {
-        return repository.getAllUsers();
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User addUser(User user) {
-        if ((user.getEmail() == null) || (user.getEmail().isEmpty()) || (!user.getEmail().contains("@"))) {
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (repository.getUserByEmail(user.getEmail()) != null) {
-            throw new RuntimeException("Пользователь с таким email уже существует.");
-        }
-        if (repository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Пользователь с таким email уже существует.");
-        }
-        return repository.addUser(user);
+    public UserDto addUser(Long id, String email, String name) {
+        return UserMapper.toUserDto(userRepository.save(new User(id, email, name)));
     }
 
     @Override
-    public User updateUser(long userId, User user) {
+    public UserDto updateUser(long userId, User user) {
         if (user == null) {
             throw new DataNotFoundException("Пользователь не найден.");
         }
-        User userUpdate = repository.getUserById(userId);
+        if (user.getId() == null) {
+            user.setId(userId);
+        }
+        User userUpdate = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с ID=" + userId + " не найден!"));
         if (userUpdate == null) {
             throw new DataNotFoundException("Пользователь не найден.");
         }
@@ -46,22 +45,25 @@ public class UserServiceImpl implements UserService {
             userUpdate.setName(user.getName());
         }
         if (user.getEmail() != null) {
-            User userByEmail = repository.getUserByEmail(user.getEmail());
-            if (userByEmail != null && !userByEmail.getId().equals(userId)) {
+            User userByEmail = userRepository.getUserByEmail(user.getEmail());
+            if (userByEmail == null) {
+                userUpdate.setEmail(user.getEmail());
+            } else if (!userByEmail.getId().equals(userId)) {
                 throw new RuntimeException("Пользователь с таким email уже существует.");
             }
-            userUpdate.setEmail(user.getEmail());
         }
-        return repository.addUser(userUpdate);
+        return UserMapper.toUserDto(userRepository.save(userUpdate));
     }
 
     @Override
-    public User getUserById(long userId) {
-        return repository.getUserById(userId);
+    public UserDto getUserById(long userId) {
+        return UserMapper.toUserDto(userRepository.findById(userId).orElseThrow(
+                () -> new DataNotFoundException("Пользователь не найден"))
+        );
     }
 
     @Override
     public void deleteUserById(long userId) {
-        repository.deleteUserById(userId);
+        userRepository.deleteById(userId);
     }
 }
