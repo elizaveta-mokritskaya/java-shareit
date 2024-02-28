@@ -2,10 +2,14 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Status;
+import ru.practicum.shareit.request.ItemRequestService;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -20,6 +24,7 @@ import java.util.Objects;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
     private final UserService userService;
+    ItemRequestService requestService;
 
     @Override
     public List<Item> getItems(Long userId) {
@@ -27,7 +32,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item addNewItem(Long userId, String name, String description, Boolean available) {
+    public List<Item> getItemsToPage(Long userId, int from, int size) {
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        return repository.findAllByUserIdPage(userId, PageRequest.of(from, size, sortById)).getContent();
+    }
+
+    @Override
+    public Item addNewItem(Long userId, String name, String description, Boolean available, Long requestId) {
         User user = UserMapper.toUser(userService.getUserById(userId));
         Status status;
         if (available) {
@@ -41,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
                 description,
                 status,
                 user,
-                null
+                requestId != null ? requestService.getRequestById(userId, requestId) : null
         ));
     }
 
@@ -90,16 +101,20 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> getItemsByDescription(String text) {
+    public List<Item> getItemsByDescription(String text, int from, int size) {
         if (text.isEmpty()) {
             return Collections.emptyList();
         }
-        return repository.getItemsByDescription(text);
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        return repository.getItemsByDescription(text, PageRequest.of(from, size, sort)).getContent();
     }
 
     @Override
     public boolean userIsOwnerOfItem(long userId, Long itemId) {
-        return userService.getUserById(userId).getId().equals(repository.getReferenceById(itemId).getOwner().getId());
+        if (userService.getUserById(userId).getId().equals(repository.getReferenceById(itemId).getOwner().getId())) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -108,5 +123,11 @@ public class ItemServiceImpl implements ItemService {
             throw new DataNotFoundException("Владелец вещи не найден");
         }
         return repository.getByOwnerId(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Item> findItemsByRequestId(long requestId) {
+        return repository.findAllByRequestId(requestId);
     }
 }
