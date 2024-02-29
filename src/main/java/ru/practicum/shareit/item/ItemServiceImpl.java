@@ -24,7 +24,7 @@ import java.util.Objects;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
     private final UserService userService;
-    ItemRequestService requestService;
+    private final ItemRequestService requestService;
 
     @Override
     public List<Item> getItems(Long userId) {

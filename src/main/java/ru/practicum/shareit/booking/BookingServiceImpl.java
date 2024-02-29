@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingOutcomeDto;
@@ -103,11 +105,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsByUser(Long userId, SearchStatus state) {
+    public List<Booking> getBookingsByUser(Long userId, SearchStatus state, int from, int size) {
         if (userService.getUserById(userId) == null) {
             throw new DataNotFoundException("Пользователь не найден.");
         }
         List<Booking> bookings;
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         switch (state) {
             case CURRENT:
                 bookings = repository.getBookingForBookerAndStartIsBeforeAndEndAfter(userId, LocalDateTime.now());
@@ -125,17 +128,20 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.getBookingForBookerAndStatus(userId, Status.REJECTED);
                 break;
             default:
-                bookings = repository.findAllByBookerId(userId);
+                bookings = repository.findAllByBookerId(userId,
+                        PageRequest.of(from,size, sort))
+                        .getContent();
         }
         return bookings;
     }
 
     @Override
-    public List<BookingOutcomeDto> getBookingsByOwner(Long userId, SearchStatus state) {
+    public List<BookingOutcomeDto> getBookingsByOwner(Long userId, SearchStatus state, int from, int size) {
         if (userService.getUserById(userId) == null) {
             throw new DataNotFoundException("Пользователь не найден.");
         }
         List<Booking> bookings;
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         switch (state) {
             case CURRENT:
                 bookings = repository.getBookingByOwnerIdAndStartIsBeforeAndEndAfter(userId, LocalDateTime.now());
@@ -153,7 +159,9 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.getBookingByOwner_IdAndStatus(userId, Status.REJECTED);
                 break;
             default:
-                bookings = repository.findAllByOwnerId(userId);
+                bookings = repository.findAllByOwnerId(userId,
+                        PageRequest.of(from,size, sort))
+                        .getContent();
         }
         return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }

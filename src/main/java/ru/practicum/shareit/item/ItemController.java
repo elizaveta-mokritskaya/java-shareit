@@ -24,9 +24,14 @@ public class ItemController {
     private final CommentService commentService;
 
     @GetMapping
-    public List<ItemOutcomeInfoDto> get(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemOutcomeInfoDto> get(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                        @RequestParam(name = "from", defaultValue = "0") int from,
+                                        @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен запрос - показать список вещей пользователя '{}'", userId);
-        return itemService.getItems(userId).stream().map(
+        if ((from < 0) || (size < 1)) {
+            throw new ValidationException("Параметры запроса неверны");
+        }
+        return itemService.getItemsToPage(userId, from/size, size).stream().map(
                         item -> {
                             List<Booking> bookingList = bookingService.getBookingsForUser(item.getId());
                             List<Comment> commentList = commentService.getComments(item.getId());

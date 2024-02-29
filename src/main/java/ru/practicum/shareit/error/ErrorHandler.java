@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exception.DataNotFoundException;
-import ru.practicum.shareit.exception.NoEnumValueArgumentException;
 import ru.practicum.shareit.exception.ValidationException;
+
+import javax.persistence.EntityNotFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -32,17 +33,10 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleInvalidUserNotFound(final IllegalArgumentException e) {
+    public ErrorResponse handleInvalidEmail(final EntityNotFoundException e) {
         log.info("Ошибка валидации");
         return new ErrorResponse(
                 "Ошибка валидации", e.getMessage()
         );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNoEnumValueArgumentException(final NoEnumValueArgumentException e) {
-        log.error("Unknown state: UNSUPPORTED_STATUS, {}", e.getMessage());
-        return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
 }

@@ -7,7 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingIncomeDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingOutcomeDto;
 import ru.practicum.shareit.booking.dto.SearchStatus;
-import ru.practicum.shareit.exception.NoEnumValueArgumentException;
+import ru.practicum.shareit.exception.ValidationException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,7 +21,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingOutcomeDto saveNewBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingOutcomeDto saveNewBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                                             @Valid @RequestBody BookingIncomeDto dto) {
         log.info("Получен запрос на добавление нового бронирования '{}' пользователем '{}'", dto, userId);
         return bookingService.saveNewBooking(dto.getStart(), dto.getEnd(), dto.getItemId(), userId);
@@ -44,29 +44,39 @@ public class BookingController {
 
     @GetMapping
     public List<BookingOutcomeDto> getBookingsByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                     @RequestParam(name = "state", defaultValue = "ALL") String stateParam) {
+                                                     @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
+                                                     @RequestParam(name = "from", defaultValue = "0") int from,
+                                                     @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен запрос на получение " +
                 "списка бронирований пользователя с ID={} с параметром STATE={}", userId, stateParam);
         SearchStatus state;
         try {
             state = SearchStatus.valueOf(stateParam);
         } catch (IllegalArgumentException e) {
-            throw new NoEnumValueArgumentException("Unknown state: UNSUPPORTED_STATUS");
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }
-        return bookingService.getBookingsByUser(userId, state).stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        if ((from < 0) || (size < 1)) {
+            throw new ValidationException("Неверные параметры запроса");
+        }
+        return bookingService.getBookingsByUser(userId, state, from/size, size).stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
     @GetMapping("/owner")
     public List<BookingOutcomeDto> getBookingsByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                      @RequestParam(name = "state", defaultValue = "ALL") String state) {
+                                                      @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
+                                                      @RequestParam(name = "from", defaultValue = "0") int from,
+                                                      @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен запрос на получение " +
-                "списка бронирований владельцем вещи с ID={} с параметром STATE={}", userId, state);
-        SearchStatus status;
+                "списка бронирований владельцем вещи с ID={} с параметром STATE={}", userId, stateParam);
+        SearchStatus state;
         try {
-            status = SearchStatus.valueOf(state);
+            state = SearchStatus.valueOf(stateParam);
         } catch (IllegalArgumentException e) {
-            throw new NoEnumValueArgumentException("Unknown state: UNSUPPORTED_STATUS");
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }
-        return bookingService.getBookingsByOwner(userId, status);
+        if ((from < 0) || (size < 1)) {
+            throw new ValidationException("Неверные параметры запроса");
+        }
+        return bookingService.getBookingsByOwner(userId, state, from/size, size);
     }
 }
