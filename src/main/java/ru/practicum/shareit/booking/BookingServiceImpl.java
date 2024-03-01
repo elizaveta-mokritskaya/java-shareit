@@ -32,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingOutcomeDto saveNewBooking(LocalDateTime start, LocalDateTime end, Long itemId, Long userId) {
         User booker = UserMapper.toUser(userService.getUserById(userId));
-        Status status = Status.WAITING;
+        BookingStatus bookingStatus = BookingStatus.WAITING;
         Item item = itemService.getItemById(userId, itemId);
         if (item.getOwner().getId().equals(booker.getId())) {
             throw new DataNotFoundException("Вещь не может быть забронирована её владельцем.");
@@ -43,7 +43,7 @@ public class BookingServiceImpl implements BookingService {
         if (start.isAfter(end) || start.equals(end)) {
             throw new ValidationException("Время начала бронирования не может быть позже окончания.");
         }
-        return BookingMapper.toBookingDto(repository.save(new Booking(null, start, end, item, booker, status)));
+        return BookingMapper.toBookingDto(repository.save(new Booking(null, start, end, item, booker, bookingStatus)));
     }
 
     @Override
@@ -60,24 +60,24 @@ public class BookingServiceImpl implements BookingService {
         }
         if (booking.getBooker().getId().equals(userId)) {
             if (!approved) {
-                booking.setStatus(Status.CANCELED);
+                booking.setBookingStatus(BookingStatus.CANCELED);
                 log.info("Бронирование отменено.");
             } else {
                 throw new DataNotFoundException("Только владелец вещи может подтвердить бронирование!");
             }
-        } else if ((itemValid) && (!booking.getStatus().equals(Status.CANCELED))) {
-            if (!(booking.getStatus().equals(Status.WAITING))) {
+        } else if ((itemValid) && (!booking.getBookingStatus().equals(BookingStatus.CANCELED))) {
+            if (!(booking.getBookingStatus().equals(BookingStatus.WAITING))) {
                 throw new ValidationException("Не новое бронирование, решение уже принято");
             }
             if (approved) {
-                booking.setStatus(Status.APPROVED);
+                booking.setBookingStatus(BookingStatus.APPROVED);
                 log.info("Пользователь с ID={} подтвердил бронирование с ID={}", userId, bookingId);
             } else {
-                booking.setStatus(Status.REJECTED);
+                booking.setBookingStatus(BookingStatus.REJECTED);
                 log.info("Пользователь с ID={} отклонил бронирование с ID={}", userId, bookingId);
             }
         } else {
-            if (booking.getStatus().equals(Status.CANCELED)) {
+            if (booking.getBookingStatus().equals(BookingStatus.CANCELED)) {
                 throw new ValidationException("Бронирование было отменено!");
             } else {
                 throw new ValidationException("Подтвердить бронирование может только владелец вещи!");
@@ -122,10 +122,10 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.getBookingForBookerIdAndStartAfter(userId, LocalDateTime.now());
                 break;
             case WAITING:
-                bookings = repository.getBookingForBookerAndStatus(userId, Status.WAITING);
+                bookings = repository.getBookingForBookerAndStatus(userId, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = repository.getBookingForBookerAndStatus(userId, Status.REJECTED);
+                bookings = repository.getBookingForBookerAndStatus(userId, BookingStatus.REJECTED);
                 break;
             default:
                 bookings = repository.findAllByBookerId(userId,
@@ -153,10 +153,10 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.getBookingByOwnerIdAndStartAfter(userId, LocalDateTime.now());
                 break;
             case WAITING:
-                bookings = repository.getBookingByOwner_IdAndStatus(userId, Status.WAITING);
+                bookings = repository.getBookingByOwner_IdAndStatus(userId, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = repository.getBookingByOwner_IdAndStatus(userId, Status.REJECTED);
+                bookings = repository.getBookingByOwner_IdAndStatus(userId, BookingStatus.REJECTED);
                 break;
             default:
                 bookings = repository.findAllByOwnerId(userId,

@@ -10,12 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -28,8 +26,6 @@ class UserControllerMvcTest {
     MockMvc mockMvc;
     @MockBean
     UserService userService;
-    private User userToCheck1 = new User(1L, "user1@mail.ru", "user1");
-    private User userToCheck2 = new User(2L, "user2@mail.ru", "user2");
 
     @Test
     @DisplayName("При запросе должны вернуться все пользователи Дто")
@@ -97,7 +93,7 @@ class UserControllerMvcTest {
 
     @Test
     @DisplayName("Ответ 200 при запросе на удаление")
-    void deleteUser() throws Exception {
+    void deleteUserTest() throws Exception {
         mockMvc.perform(
                 delete("/users/1"))
                 .andExpect(status().isOk());

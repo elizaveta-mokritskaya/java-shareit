@@ -41,7 +41,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking as b where b.item.owner.id = :userId and b.status = :status " +
             "order by b.start desc ")
-    List<Booking> getBookingByOwner_IdAndStatus(Long userId, Status status);
+    List<Booking> getBookingByOwner_IdAndStatus(Long userId, BookingStatus bookingStatus);
 
     @Query("select b from Booking as b where b.item.id = :itemId ")
     List<Booking> findAllByItemId(Long itemId);
@@ -63,6 +63,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking as b where b.booker.id = :userId and b.status = :status " +
             "order by b.start desc ")
-    List<Booking> getBookingForBookerAndStatus(Long userId, Status status);
+    List<Booking> getBookingForBookerAndStatus(Long userId, BookingStatus bookingStatus);
 }
 
