@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.time.LocalDateTime;
@@ -48,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingOutcomeDto updateBooking(long bookingId, Long userId, Boolean approved) {
-        User booker = UserMapper.toUser(userService.getUserById(userId));
+        UserDto booker = userService.getUserById(userId);
         if (booker == null) {
             throw new DataNotFoundException("Пользователь не найден.");
         }
@@ -94,9 +95,10 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = repository.findById(bookingId)
                 .orElseThrow(() -> new DataNotFoundException("Вещь с таким id не найдена."));
         List<Item> items = itemService.findItemsByOwnerId(userId);
-        boolean isItemOwner = items.stream().anyMatch(item -> Objects.equals(item.getId(), booking.getItem().getId()));
-        if (booking.getBooker().getId().equals(userId)
-                || (isItemOwner)) {
+        boolean isItemOwner = items.stream().anyMatch(
+                item -> Objects.equals(item.getId(), booking.getItem().getId())
+        );
+        if (booking.getBooker().getId().equals(userId) || (isItemOwner)) {
             return BookingMapper.toBookingDto(booking);
         } else {
             throw new DataNotFoundException("Видеть данные бронирования может только владелец вещи" +

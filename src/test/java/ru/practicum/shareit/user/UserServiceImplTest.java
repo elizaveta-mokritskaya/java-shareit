@@ -32,7 +32,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("Показывает список всех пользователей Дто")
-    public void getAllUsersTest() {
+    void getAllUsersTest() {
         List<User> users = List.of(validUser1, validUser2);
         when(mockUserRepository.findAll()).thenReturn(users);
 
@@ -56,7 +56,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("Некорректное сохранение пользователя")
-    public void addUser_whenUserNotValid_thenNotSaveUser() {
+    void addUser_whenUserNotValid_thenNotSaveUser() {
         when(mockUserRepository.save(any())).thenThrow(new DataNotFoundException("Пользователь не найден"));
 
         final DataNotFoundException exception = Assertions.assertThrows(
@@ -68,7 +68,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("Обновление пользователя")
-    public void updateUser_whenUserIsValid() {
+    void updateUser_whenUserIsValid() {
         User oldUser = User.builder()
                 .id(3L)
                 .email("oldUser1@mail.ru")
@@ -90,7 +90,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("Обновление пользователя если входящий параметр null необходимо выбрасывать исключение ")
-    public void updateUser_whenUserNull_thenDataNotFoundException() {
+    void updateUser_whenUserNull_thenDataNotFoundException() {
         final DataNotFoundException exception = Assertions.assertThrows(
                 DataNotFoundException.class,
                 () -> userService.updateUser(1L, null));
@@ -101,7 +101,7 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Обновление пользователя если у входящего параметра пользователя Id null" +
             " пользователь будет сохранен с Id")
-    public void updateUser_whenUserIdNull_thenUserSaveWithId() {
+    void updateUser_whenUserIdNull_thenUserSaveWithId() {
         User oldUser = User.builder()
                 .id(3L)
                 .email("oldUser1@mail.ru")
@@ -122,7 +122,7 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Обновление пользователя если у входящего параметра пользователя используемый email" +
             " будет выбрасываться исключение")
-    public void updateUser_whenUserEmailNotFree_thenRuntimeException() {
+    void updateUser_whenUserEmailNotFree_thenRuntimeException() {
         User user = new User(2L, "aa@mail.ru", "new");
         when(mockUserRepository.findById(2L)).thenReturn(Optional.ofNullable(validUser2));
         when(mockUserRepository.getUserByEmail("aa@mail.ru")).thenReturn(validUser1);
@@ -158,6 +158,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Удаление пользователя")
     void deleteUserById() {
         userService.deleteUserById(1L);
         verify(mockUserRepository, times(1)).deleteById(1L);

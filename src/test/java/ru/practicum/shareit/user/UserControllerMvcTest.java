@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,7 +36,7 @@ class UserControllerMvcTest {
         UserDto userDto2 = new UserDto(2L, "user2@mail.ru", "user2");
         userDtoList.add(userDto1);
         userDtoList.add(userDto2);
-        Mockito.when(this.userService.getAllUsers()).thenReturn(userDtoList);
+        when(this.userService.getAllUsers()).thenReturn(userDtoList);
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
@@ -46,7 +47,7 @@ class UserControllerMvcTest {
     @DisplayName("Возвращает UserDto при сохранении")
     void addNewUser_returnUserDto() throws Exception {
         UserDto userDto1 = new UserDto(1L, "user1@mail.ru", "user1");
-        Mockito.when(this.userService.addUser(any(),any(),any()))
+        when(this.userService.addUser(any(),any(),any()))
                 .thenReturn(userDto1);
 
         mockMvc.perform(post("/users")
@@ -64,7 +65,7 @@ class UserControllerMvcTest {
     @Test
     @DisplayName("При запросе несуществующего пользователя возвращает ошибку")
     void updateUserTest() throws Exception {
-        Mockito.when(this.userService.updateUser(anyLong(), any()))
+        when(this.userService.updateUser(anyLong(), any()))
                 .thenThrow(new DataNotFoundException("Пользователь не найден."));
 
         mockMvc.perform(
@@ -81,7 +82,7 @@ class UserControllerMvcTest {
     @DisplayName("Возвращает UserDto при запросе")
     void getUser_returnUserDto() throws Exception {
         UserDto userDto1 = new UserDto(1L, "user1@mail.ru", "user1");
-        Mockito.when(this.userService.getUserById(1L)).thenReturn(userDto1);
+        when(this.userService.getUserById(1L)).thenReturn(userDto1);
         mockMvc.perform(
                         get("/users/1")
                                 .contentType(MediaType.APPLICATION_JSON))
