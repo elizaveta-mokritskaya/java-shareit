@@ -39,7 +39,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     /**
      * WAITING ожид.подтв. REJECTED отклонён
      */
-    @Query("select b from Booking as b where b.item.owner.id = :userId and b.status = :status " +
+    @Query("select b from Booking as b where b.item.owner.id = :userId and b.bookingStatus = :bookingStatus " +
             "order by b.start desc ")
     List<Booking> getBookingByOwner_IdAndStatus(Long userId, BookingStatus bookingStatus);
 
@@ -61,7 +61,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b from Booking as b where b.booker.id = :userId order by b.start desc ")
     Page<Booking> findAllByBookerId(Long userId, Pageable pageable);
 
-    @Query("select b from Booking as b where b.booker.id = :userId and b.status = :status " +
+    @Query("select b from Booking as b where b.booker.id = :userId and b.bookingStatus = :bookingStatus " +
             "order by b.start desc ")
     List<Booking> getBookingForBookerAndStatus(Long userId, BookingStatus bookingStatus);
 }
