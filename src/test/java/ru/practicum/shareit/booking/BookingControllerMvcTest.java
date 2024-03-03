@@ -10,22 +10,23 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingIncomeDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingOutcomeDto;
+import ru.practicum.shareit.booking.dto.SearchStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Status;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookingController.class)
@@ -62,9 +63,9 @@ class BookingControllerMvcTest {
         ownerDto = new UserDto(2L, "user2@mail.ru", "user2");
         created = LocalDateTime.now();
         start = LocalDateTime.now().plusHours(1);
-        end = LocalDateTime.now().plusDays(1);
-        request1 = new ItemRequest(1L, "запрос1", booker, created);
-        request2 = new ItemRequest(2L, "запрос2", booker, created);
+        end = LocalDateTime.now().plusDays(10);
+        request1 = new ItemRequest(1L, "request1", booker, created);
+        request2 = new ItemRequest(2L, "request2", booker, created);
         item1 = new Item(1L, "item1", "description1", Status.AVAILABLE, owner, request1);
         item2 = new Item(2L, "item2", "description2", Status.UNAVAILABLE, owner, request2);
         booking1 = new Booking(1L, start, end, item1, booker, BookingStatus.WAITING);
@@ -78,49 +79,176 @@ class BookingControllerMvcTest {
     @DisplayName("Сохраняем новое бронирование")
     void saveNewBooking() throws Exception {
         when(bookingService.saveNewBooking(start, end, 1L, 1L)).thenReturn(bookingOutcomeDto);
-        System.out.println(objectMapper.writeValueAsString(bookingIncomeDto));
-        mockMvc.perform(
-                post("/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
+
+        String result = mockMvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
                         .content(objectMapper.writeValueAsString(bookingIncomeDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.start").value(start))
-                .andExpect(jsonPath("$.end").value(end))
-                .andExpect(jsonPath("$.item.id").value(1L))
-                .andExpect(jsonPath("$.item.name").value(item1.getName()))
-                .andExpect(jsonPath("$.item.description").value(item1.getDescription()))
-                .andExpect(jsonPath("$.item.available").value(item1.getAvailable().name()))
-                .andExpect(jsonPath("$.item.owner.id").value(item1.getOwner().getId()))
-                .andExpect(jsonPath("$.item.owner.email").value(item1.getOwner().getEmail()))
-                .andExpect(jsonPath("$.item.owner.name").value(item1.getOwner().getName()))
-                .andExpect(jsonPath("$.item.request.id").value(item1.getRequest().getId()))
-                .andExpect(jsonPath("$.item.request.description").value(item1.getRequest().getDescription()))
-                .andExpect(jsonPath("$.item.request.requestor.id").value(item1.getRequest().getRequestor().getId()))
-                .andExpect(jsonPath("$.item.request.requestor.email").value(item1.getRequest().getRequestor().getEmail()))
-                .andExpect(jsonPath("$.item.request.requestor.name").value(item1.getRequest().getRequestor().getName()))
-                .andExpect(jsonPath("$.item.request.createdTime").value(item1.getRequest().getCreatedTime()))
-                .andExpect(jsonPath("$.item.request.createdTime").value(item1.getRequest().getCreatedTime()))
-                .andExpect(jsonPath("$.booker.id").value(booker.getId()))
-                .andExpect(jsonPath("$.booker.email").value(booker.getEmail()))
-                .andExpect(jsonPath("$.booker.name").value(booker.getName()))
-                .andExpect(jsonPath("$.status").value(status()));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(objectMapper.writeValueAsString(bookingOutcomeDto), result);
     }
 
     @Test
-    void updateBooking() {
+    @DisplayName("Bad_Request при сохранении бронирования")
+    void saveNewBooking_returnBadRequest() throws Exception {
+
+        mockMvc.perform(post("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content("request"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void getBookingById() {
+    @DisplayName("Успешное обновление")
+    void updateBookingTest() throws Exception {
+        when(bookingService.updateBooking(1L,1L,true)).thenReturn(bookingOutcomeDto);
+        bookingOutcomeDto.setStatus(BookingStatus.APPROVED.name());
+        String result = mockMvc.perform(patch("/bookings/{bookingId}", 1L)
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("approved","true"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(objectMapper.writeValueAsString(bookingOutcomeDto), result);
     }
 
     @Test
-    void getBookingsByUser() {
+    @DisplayName("Неуспешное обновление")
+    void updateBookingTest_badRequest() throws Exception{
+        mockMvc.perform(patch("/bookings/{bookingId}", 1L)
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("неправильный параметр","неправильный параметр"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void getBookingsByOwner() {
+    @DisplayName("Выдает бронирование по userId")
+    void getBookingById() throws  Exception {
+        when(bookingService.getBookingById(1L,1L)).thenReturn(bookingOutcomeDto);
+
+        String result = mockMvc.perform(get("/bookings/{bookingId}", 1L)
+                        .header("X-Sharer-User-Id", 1L))
+                        .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(objectMapper.writeValueAsString(bookingOutcomeDto), result);
+    }
+
+    @Test
+    @DisplayName("Ошибка при получении бронирования по userId")
+    void getBookingById_badRequest() throws  Exception {
+        when(bookingService.getBookingById(1L,1L)).thenReturn(bookingOutcomeDto);
+
+        mockMvc.perform(get("/bookings/{bookingId}", 1L)
+                        .header("Неверно! X-Sharer-User-Id", 1L))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @DisplayName("Получение списка бронирований по userId")
+    void getBookingsByUser() throws Exception {
+        List<Booking> bookingList = List.of(booking1, booking2);
+        when(bookingService.getBookingsByUser(1L, SearchStatus.ALL, 0, 10)).thenReturn(bookingList);
+        List<BookingOutcomeDto> dtoList = bookingList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+
+        String result = mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state","ALL")
+                        .param("from", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(objectMapper.writeValueAsString(dtoList), result);
+    }
+
+    @Test
+    @DisplayName("Неверный статус - Ошибка при получение списка бронирований по userId")
+    void getBookingsByUser_badRequest_becauseOfTheStatus() throws Exception {
+        List<Booking> bookingList = List.of(booking1, booking2);
+        when(bookingService.getBookingsByUser(1L, SearchStatus.ALL, 0, 10)).thenReturn(bookingList);
+
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state","UNSUPPORTED_STATUS")
+                        .param("from", "0")
+                        .param("size", "10"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Неверные параметры - Ошибка при получение списка бронирований по userId")
+    void getBookingsByUser_badRequest_becauseOfTheParam() throws Exception {
+        List<Booking> bookingList = List.of(booking1, booking2);
+        when(bookingService.getBookingsByUser(1L, SearchStatus.ALL, 0, 10)).thenReturn(bookingList);
+        List<BookingOutcomeDto> dtoList = bookingList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state","UNSUPPORTED_STATUS")
+                        .param("from", "-2")
+                        .param("size", "-5"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Получение списка бронирований по ownerId")
+    void getBookingsByOwner() throws Exception {
+        List<BookingOutcomeDto> dtoList = List.of(bookingOutcomeDto, bookingOutcomeDto2);
+        when(bookingService.getBookingsByOwner(1L, SearchStatus.ALL, 0, 10)).thenReturn(dtoList);
+
+        String result = mockMvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state","ALL")
+                        .param("from", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(objectMapper.writeValueAsString(dtoList), result);
+    }
+
+    @Test
+    @DisplayName("Неверный статус - Получение списка бронирований по ownerId")
+    void getBookingsByOwner_badRequest_becauseOfTheStatus() throws Exception {
+        List<BookingOutcomeDto> dtoList = List.of(bookingOutcomeDto, bookingOutcomeDto2);
+        when(bookingService.getBookingsByOwner(1L, SearchStatus.ALL, 0, 10)).thenReturn(dtoList);
+
+        mockMvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state","UNSUPPORTED_STATUS")
+                        .param("from", "0")
+                        .param("size", "10"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Неверные параметры - Получение списка бронирований по ownerId")
+    void getBookingsByOwner_badRequest_becauseOfTheParam() throws Exception {
+        List<BookingOutcomeDto> dtoList = List.of(bookingOutcomeDto, bookingOutcomeDto2);
+        when(bookingService.getBookingsByOwner(1L, SearchStatus.ALL, 0, 10)).thenReturn(dtoList);
+
+        mockMvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state","ALL")
+                        .param("from", "-2")
+                        .param("size", "-5"))
+                .andExpect(status().isBadRequest());
     }
 }

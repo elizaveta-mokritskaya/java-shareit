@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 
@@ -15,6 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "and i.available = ru.practicum.shareit.item.model.Status.AVAILABLE ")
     Page<Item> getItemsByDescription(String text, Pageable pageable);
 
+    @Modifying
     @Query("delete from Item as i " +
             "where i.id = :itemId and i.owner.id = :userId")
     void deleteByUserIdAndItemId(long itemId, long userId);
