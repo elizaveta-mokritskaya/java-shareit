@@ -16,14 +16,14 @@ import ru.practicum.shareit.item.model.Status;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
 import ru.practicum.shareit.request.dto.ItemRequestInfoDto;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)

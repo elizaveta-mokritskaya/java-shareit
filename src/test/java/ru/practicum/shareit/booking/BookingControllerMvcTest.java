@@ -108,11 +108,11 @@ class BookingControllerMvcTest {
     @Test
     @DisplayName("Успешное обновление")
     void updateBookingTest() throws Exception {
-        when(bookingService.updateBooking(1L,1L,true)).thenReturn(bookingOutcomeDto);
+        when(bookingService.updateBooking(1L, 1L, true)).thenReturn(bookingOutcomeDto);
         bookingOutcomeDto.setStatus(BookingStatus.APPROVED.name());
         String result = mockMvc.perform(patch("/bookings/{bookingId}", 1L)
                         .header("X-Sharer-User-Id", 1L)
-                        .param("approved","true"))
+                        .param("approved", "true"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -123,21 +123,21 @@ class BookingControllerMvcTest {
 
     @Test
     @DisplayName("Неуспешное обновление")
-    void updateBookingTest_badRequest() throws Exception{
+    void updateBookingTest_badRequest() throws Exception {
         mockMvc.perform(patch("/bookings/{bookingId}", 1L)
                         .header("X-Sharer-User-Id", 1L)
-                        .param("неправильный параметр","неправильный параметр"))
+                        .param("неправильный параметр", "неправильный параметр"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Выдает бронирование по userId")
-    void getBookingById() throws  Exception {
-        when(bookingService.getBookingById(1L,1L)).thenReturn(bookingOutcomeDto);
+    void getBookingById() throws Exception {
+        when(bookingService.getBookingById(1L, 1L)).thenReturn(bookingOutcomeDto);
 
         String result = mockMvc.perform(get("/bookings/{bookingId}", 1L)
                         .header("X-Sharer-User-Id", 1L))
-                        .andExpect(status().isOk())
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -147,8 +147,8 @@ class BookingControllerMvcTest {
 
     @Test
     @DisplayName("Ошибка при получении бронирования по userId")
-    void getBookingById_badRequest() throws  Exception {
-        when(bookingService.getBookingById(1L,1L)).thenReturn(bookingOutcomeDto);
+    void getBookingById_badRequest() throws Exception {
+        when(bookingService.getBookingById(1L, 1L)).thenReturn(bookingOutcomeDto);
 
         mockMvc.perform(get("/bookings/{bookingId}", 1L)
                         .header("Неверно! X-Sharer-User-Id", 1L))
@@ -165,7 +165,7 @@ class BookingControllerMvcTest {
 
         String result = mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", 1L)
-                        .param("state","ALL")
+                        .param("state", "ALL")
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -184,7 +184,7 @@ class BookingControllerMvcTest {
 
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", 1L)
-                        .param("state","UNSUPPORTED_STATUS")
+                        .param("state", "UNSUPPORTED_STATUS")
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isBadRequest());
@@ -199,7 +199,7 @@ class BookingControllerMvcTest {
 
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", 1L)
-                        .param("state","UNSUPPORTED_STATUS")
+                        .param("state", "UNSUPPORTED_STATUS")
                         .param("from", "-2")
                         .param("size", "-5"))
                 .andExpect(status().isBadRequest());
@@ -213,7 +213,7 @@ class BookingControllerMvcTest {
 
         String result = mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", 1L)
-                        .param("state","ALL")
+                        .param("state", "ALL")
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -232,7 +232,7 @@ class BookingControllerMvcTest {
 
         mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", 1L)
-                        .param("state","UNSUPPORTED_STATUS")
+                        .param("state", "UNSUPPORTED_STATUS")
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isBadRequest());
@@ -246,7 +246,7 @@ class BookingControllerMvcTest {
 
         mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", 1L)
-                        .param("state","ALL")
+                        .param("state", "ALL")
                         .param("from", "-2")
                         .param("size", "-5"))
                 .andExpect(status().isBadRequest());

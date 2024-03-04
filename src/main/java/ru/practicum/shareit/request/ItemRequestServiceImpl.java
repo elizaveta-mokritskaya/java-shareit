@@ -9,6 +9,7 @@ import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.time.LocalDateTime;
@@ -23,19 +24,21 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequest addNewRequest(Long userId, String description) {
-        User user = UserMapper.toUser(userService.getUserById(userId));
+        UserDto user = userService.getUserById(userId);
         if (user == null) {
             throw new DataNotFoundException("Пользователь не найден");
         }
         if (description == null) {
             throw new ValidationException("Описание не может быть пустым");
         }
-        return repository.save(new ItemRequest(null, description, user, LocalDateTime.now()));
+        User toUser = UserMapper.toUser(user);
+        return repository.save(new ItemRequest(null, description, toUser, LocalDateTime.now()));
     }
 
     @Override
     public ItemRequest getRequestById(Long userId, Long requestId) {
-        if (userService.getUserById(userId) == null) {
+        UserDto user = userService.getUserById(userId);
+        if (user == null) {
             throw new DataNotFoundException("Пользователь не найден");
         }
         ItemRequest resultRequest = repository.findById(requestId).orElse(null);

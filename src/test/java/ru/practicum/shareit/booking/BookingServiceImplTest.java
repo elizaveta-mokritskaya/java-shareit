@@ -29,7 +29,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
@@ -56,8 +56,8 @@ class BookingServiceImplTest {
     private Booking booking1;
     private Booking booking2;
     private BookingIncomeDto bookingIncomeDto;
-    BookingOutcomeDto bookingOutcomeDto;
-    BookingOutcomeDto bookingOutcomeDto2;
+    private BookingOutcomeDto bookingOutcomeDto;
+    private BookingOutcomeDto bookingOutcomeDto2;
 
     @BeforeEach
     void setUp() {
@@ -86,7 +86,7 @@ class BookingServiceImplTest {
                 1L, start, end, item1, booker, BookingStatus.WAITING.name()
         );
         when(mockUserService.getUserById(anyLong())).thenReturn(bookerDto);
-        when(mockItemService.getItemById(anyLong(),anyLong())).thenReturn(item1);
+        when(mockItemService.getItemById(anyLong(), anyLong())).thenReturn(item1);
         when(mockBookingRepository.save(any())).thenReturn(booking1);
 
         BookingOutcomeDto actual = bookingService.saveNewBooking(start, end, item1.getId(), bookerDto.getId());
@@ -98,7 +98,7 @@ class BookingServiceImplTest {
     @DisplayName("Хозяин пытается забронировать вещь - исключение")
     void saveNewBookingTest_isNotSuccess() {
         when(mockUserService.getUserById(anyLong())).thenReturn(ownerDto);
-        when(mockItemService.getItemById(anyLong(),anyLong())).thenReturn(item1);
+        when(mockItemService.getItemById(anyLong(), anyLong())).thenReturn(item1);
 
         final DataNotFoundException exception = Assertions.assertThrows(
                 DataNotFoundException.class,
@@ -111,7 +111,7 @@ class BookingServiceImplTest {
     @DisplayName("Попытка забронировать занятую вещь")
     void saveNewBookingTest_ItemNotAvailable() {
         when(mockUserService.getUserById(anyLong())).thenReturn(bookerDto);
-        when(mockItemService.getItemById(anyLong(),anyLong())).thenReturn(item2);
+        when(mockItemService.getItemById(anyLong(), anyLong())).thenReturn(item2);
 
         final ValidationException exception = Assertions.assertThrows(
                 ValidationException.class,
@@ -128,13 +128,14 @@ class BookingServiceImplTest {
         LocalDateTime endTest = LocalDateTime.of(2024, 3, 1, 12, 0, 0);
 
         when(mockUserService.getUserById(anyLong())).thenReturn(bookerDto);
-        when(mockItemService.getItemById(anyLong(),anyLong())).thenReturn(item1);
+        when(mockItemService.getItemById(anyLong(), anyLong())).thenReturn(item1);
         final ValidationException exception = Assertions.assertThrows(
                 ValidationException.class,
                 () -> bookingService.saveNewBooking(startTest, endTest, item1.getId(), bookerDto.getId()));
 
         assertEquals("Время начала бронирования не может быть позже окончания.", exception.getMessage());
     }
+
     @Test
     @DisplayName("Бронирование с одинаковыми датами")
     void saveNewBookingTest_StartIsEqualsEnd() {
@@ -142,7 +143,7 @@ class BookingServiceImplTest {
         LocalDateTime endTest = LocalDateTime.of(2024, 3, 3, 12, 0, 0);
 
         when(mockUserService.getUserById(anyLong())).thenReturn(bookerDto);
-        when(mockItemService.getItemById(anyLong(),anyLong())).thenReturn(item1);
+        when(mockItemService.getItemById(anyLong(), anyLong())).thenReturn(item1);
         final ValidationException exception = Assertions.assertThrows(
                 ValidationException.class,
                 () -> bookingService.saveNewBooking(startTest, endTest, item1.getId(), bookerDto.getId()));
@@ -317,6 +318,6 @@ class BookingServiceImplTest {
 
         List<Booking> result = bookingService.getBookingsForUser(1L);
 
-        assertEquals(bookingList,result);
+        assertEquals(bookingList, result);
     }
 }

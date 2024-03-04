@@ -2,7 +2,6 @@ package ru.practicum.shareit.user;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -47,15 +46,15 @@ class UserControllerMvcTest {
     @DisplayName("Возвращает UserDto при сохранении")
     void addNewUser_returnUserDto() throws Exception {
         UserDto userDto1 = new UserDto(1L, "user1@mail.ru", "user1");
-        when(this.userService.addUser(any(),any(),any()))
+        when(this.userService.addUser(any(), any(), any()))
                 .thenReturn(userDto1);
 
         mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\n" +
-                        "  \"name\": \"update\",\n" +
-                        "  \"email\": \"update@user.com\"\n" +
-                        "}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "  \"name\": \"update\",\n" +
+                                "  \"email\": \"update@user.com\"\n" +
+                                "}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("user1@mail.ru"))
@@ -96,7 +95,7 @@ class UserControllerMvcTest {
     @DisplayName("Ответ 200 при запросе на удаление")
     void deleteUserTest() throws Exception {
         mockMvc.perform(
-                delete("/users/1"))
+                        delete("/users/1"))
                 .andExpect(status().isOk());
     }
 }

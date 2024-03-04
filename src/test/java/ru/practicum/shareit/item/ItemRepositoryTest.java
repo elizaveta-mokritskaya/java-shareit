@@ -10,19 +10,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Status;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -31,12 +27,10 @@ class ItemRepositoryTest {
     private final TestEntityManager entityManager;
     private final ItemRepository itemRepository;
 
-    private Pageable pageable =  PageRequest.of(0, 10);
+    private Pageable pageable = PageRequest.of(0, 10);
 
     private User booker;
     private User owner;
-    private UserDto bookerDto;
-    private UserDto ownerDto;
     private LocalDateTime created;
     private LocalDateTime start;
     private LocalDateTime end;
@@ -44,8 +38,6 @@ class ItemRepositoryTest {
     private ItemRequest request2;
     private Item item1;
     private Item item2;
-    private Booking booking1;
-    private Booking booking2;
 
     @BeforeEach
     void setUp() {
@@ -58,8 +50,6 @@ class ItemRepositoryTest {
                 .email("user2@mail.ru")
                 .build();
 
-        bookerDto = new UserDto(1L, "user1@mail.ru", "user1");
-        ownerDto = new UserDto(2L, "user2@mail.ru", "user2");
         created = LocalDateTime.now();
         start = LocalDateTime.now().plusHours(1);
         end = LocalDateTime.now().plusDays(10);
@@ -87,20 +77,6 @@ class ItemRepositoryTest {
                 .available(Status.AVAILABLE)
                 .owner(owner)
                 .request(request2)
-                .build();
-        booking1 = Booking.builder()
-                .start(start)
-                .end(end)
-                .item(item1)
-                .booker(booker)
-                .bookingStatus(BookingStatus.WAITING)
-                .build();
-        booking2 = Booking.builder()
-                .start(start)
-                .end(end)
-                .item(item2)
-                .booker(booker)
-                .bookingStatus(BookingStatus.WAITING)
                 .build();
     }
 
@@ -183,7 +159,7 @@ class ItemRepositoryTest {
         entityManager.persist(item2);
         List<Item> itemList = List.of(item1, item2);
 
-        List<Item> result = itemRepository.findAllByUserIdPage(owner.getId(),pageable).getContent();
+        List<Item> result = itemRepository.findAllByUserIdPage(owner.getId(), pageable).getContent();
 
         assertEquals(itemList, result);
     }

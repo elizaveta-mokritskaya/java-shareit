@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -110,7 +110,7 @@ class BookingControllerTest {
     @Test
     @DisplayName("Получение бронирования по bookingId")
     void getBookingById() {
-        when(bookingService.getBookingById(anyLong(),anyLong())).thenReturn(bookingOutcomeDto);
+        when(bookingService.getBookingById(anyLong(), anyLong())).thenReturn(bookingOutcomeDto);
 
         BookingOutcomeDto result = bookingController.getBookingById(1L, 1L);
 
@@ -127,7 +127,7 @@ class BookingControllerTest {
         SearchStatus status;
         when(bookingService.getBookingsByUser(anyLong(), any(), anyInt(), anyInt())).thenReturn(bookingList);
 
-        List<BookingOutcomeDto> result = bookingController.getBookingsByUser(1L,"ALL", from, size);
+        List<BookingOutcomeDto> result = bookingController.getBookingsByUser(1L, "ALL", from, size);
 
         assertEquals(dtoList, result);
     }
@@ -137,7 +137,7 @@ class BookingControllerTest {
     void getBookingsByOwner() {
         List<Booking> bookingList = List.of(booking1, booking2);
         List<BookingOutcomeDto> dtoList = bookingList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
-        when(bookingService.getBookingsByOwner(anyLong(),any(),anyInt(),anyInt())).thenReturn(dtoList);
+        when(bookingService.getBookingsByOwner(anyLong(), any(), anyInt(), anyInt())).thenReturn(dtoList);
 
         List<BookingOutcomeDto> result = bookingController.getBookingsByOwner(2L, "ALL", 0, 10);
 

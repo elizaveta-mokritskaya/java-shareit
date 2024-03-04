@@ -19,7 +19,7 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -30,9 +30,6 @@ class CommentRepositoryTest {
 
     private User booker;
     private User owner;
-    private LocalDateTime created;
-    private LocalDateTime start;
-    private LocalDateTime end;
     private ItemRequest request1;
     private ItemRequest request2;
     private Item item1;
@@ -52,9 +49,9 @@ class CommentRepositoryTest {
                 .name("owner")
                 .email("user2@mail.ru")
                 .build();
-        created = LocalDateTime.now();
-        start = LocalDateTime.now().plusHours(1);
-        end = LocalDateTime.now().plusDays(10);
+        LocalDateTime created = LocalDateTime.now();
+        LocalDateTime start = LocalDateTime.now().plusHours(1);
+        LocalDateTime end = LocalDateTime.now().plusDays(10);
         request1 = ItemRequest.builder()
                 .description("request1")
                 .requestor(booker)

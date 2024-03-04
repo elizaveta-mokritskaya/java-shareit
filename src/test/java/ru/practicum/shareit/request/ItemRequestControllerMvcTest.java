@@ -43,15 +43,15 @@ class ItemRequestControllerMvcTest {
     @Test
     @DisplayName("Возвращает ItemRequestDto")
     void addRequestTest_returnItemRequestDto() throws Exception {
-        Mockito.when(this.itemRequestService.addNewRequest(anyLong(),any())).thenReturn(request1);
+        Mockito.when(this.itemRequestService.addNewRequest(anyLong(), any())).thenReturn(request1);
 
         mockMvc.perform(
-                post("/requests")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
-                        .content("{\n" +
-                                "  \"description\": \"Хотел бы воспользоваться щёткой для обуви\"\n" +
-                                "}"))
+                        post("/requests")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("X-Sharer-User-Id", 1L)
+                                .content("{\n" +
+                                        "  \"description\": \"Хотел бы воспользоваться щёткой для обуви\"\n" +
+                                        "}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.description").value("запрос1"))
@@ -70,9 +70,9 @@ class ItemRequestControllerMvcTest {
         Mockito.when(this.itemRequestService.getRequests(1L)).thenReturn(itemRequests);
 
         mockMvc.perform(
-                get("/requests")
-                        .header("X-Sharer-User-Id", 1L)
-            )
+                        get("/requests")
+                                .header("X-Sharer-User-Id", 1L)
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
     }
@@ -86,10 +86,10 @@ class ItemRequestControllerMvcTest {
         Mockito.when(this.itemRequestService.getAllRequests(1L, 0, 10)).thenReturn(otherRequests);
 
         mockMvc.perform(
-                get("/requests/all")
-                        .header("X-Sharer-User-Id", 1L)
-                        .param("from", "0")
-                        .param("size", "10")
+                        get("/requests/all")
+                                .header("X-Sharer-User-Id", 1L)
+                                .param("from", "0")
+                                .param("size", "10")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));

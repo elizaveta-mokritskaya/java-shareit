@@ -31,7 +31,7 @@ class BookingRepositoryTest {
     private final TestEntityManager entityManager;
     private final BookingRepository bookingRepository;
 
-    private Pageable pageable =  PageRequest.of(0, 10);
+    private Pageable pageable = PageRequest.of(0, 10);
 
     private User booker;
     private User owner;

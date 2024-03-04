@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -25,8 +25,8 @@ class UserRepositoryTest {
                 .email("userTest@mail.ru")
                 .build();
         entityManager.persist(userTest);
-         User result = userRepository.getUserByEmail(userTest.getEmail());
+        User result = userRepository.getUserByEmail(userTest.getEmail());
 
-         assertEquals(userTest, result);
+        assertEquals(userTest, result);
     }
 }

@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.dto.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
@@ -46,7 +45,7 @@ class UserControllerTest {
 
         List<UserDto> result = userController.getAllUsers();
 
-        Assertions.assertEquals(2,result.size());
+        Assertions.assertEquals(2, result.size());
     }
 
     @Test
@@ -81,7 +80,7 @@ class UserControllerTest {
         Mockito.when(mockUserService.updateUser(anyLong(), any())).thenReturn(UserMapper.toUserDto(user));
         UserDto result = userController.updateUser(3L, userDto);
 
-        Assertions.assertEquals(3L,result.getId());
+        Assertions.assertEquals(3L, result.getId());
     }
 
     @Test
@@ -91,7 +90,7 @@ class UserControllerTest {
         User user = new User(3L, "user3@mail.ru", "user3");
         Mockito.when(mockUserService.updateUser(anyLong(), any())).thenReturn(UserMapper.toUserDto(user));
 
-        userController.updateUser(3L,userDto);
+        userController.updateUser(3L, userDto);
 
         verify(mockUserService).updateUser(3L, user);
     }
