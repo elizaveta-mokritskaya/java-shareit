@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,7 +17,7 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -32,8 +31,6 @@ class ItemRequestRepositoryTest {
     private User booker;
     private User owner;
     private LocalDateTime created;
-    private LocalDateTime start;
-    private LocalDateTime end;
     private ItemRequest request1;
     private ItemRequest request2;
     private Item item1;
@@ -51,8 +48,6 @@ class ItemRequestRepositoryTest {
                 .build();
 
         created = LocalDateTime.now();
-        start = LocalDateTime.now().plusHours(1);
-        end = LocalDateTime.now().plusDays(10);
         request1 = ItemRequest.builder()
                 .description("request1")
                 .requestor(booker)

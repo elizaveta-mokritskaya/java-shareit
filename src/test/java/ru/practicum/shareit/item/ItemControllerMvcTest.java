@@ -13,8 +13,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingIncomeDto;
 import ru.practicum.shareit.booking.dto.BookingOutcomeDto;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
@@ -32,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ItemController.class)
@@ -50,7 +47,6 @@ class ItemControllerMvcTest {
 
     private User booker;
     private User owner;
-    private UserDto bookerDto;
     private UserDto ownerDto;
     private LocalDateTime created;
     private LocalDateTime start;
@@ -61,18 +57,14 @@ class ItemControllerMvcTest {
     private Item item2;
     private Booking booking1;
     private Booking booking2;
-    private BookingIncomeDto bookingIncomeDto;
     BookingOutcomeDto bookingOutcomeDto;
     BookingOutcomeDto bookingOutcomeDto2;
     private Comment comment1;
-    private Comment comment2;
-    private BookingDto bookingDto1 = new BookingDto(1L, 1L, null, null);
 
     @BeforeEach
     void setUp() {
         booker = new User(1L, "booker@mail.ru", "booker");
         owner = new User(2L, "owner@mail.ru", "owner");
-        bookerDto = new UserDto(1L, "booker@mail.ru", "booker");
         ownerDto = new UserDto(2L, "owner@mail.ru", "owner");
         created = LocalDateTime.now();
         start = LocalDateTime.now().plusHours(1);
@@ -83,11 +75,9 @@ class ItemControllerMvcTest {
         item2 = new Item(2L, "item2", "description2", Status.AVAILABLE, owner, request2);
         booking1 = new Booking(1L, start, end, item1, booker, BookingStatus.WAITING);
         booking2 = new Booking(2L, start, end, item2, booker, BookingStatus.WAITING);
-        bookingIncomeDto = new BookingIncomeDto(1L, start, end, 1L);
         bookingOutcomeDto = new BookingOutcomeDto(1L, start, end, item1, booker, booking1.getBookingStatus().name());
         bookingOutcomeDto2 = new BookingOutcomeDto(2L, start, end, item2, booker, booking2.getBookingStatus().name());
         comment1 = new Comment(1L, "comment1", item1, booker, created);
-        comment2 = new Comment(2L, "comment2", item2, booker, created);
     }
 
     @Test
@@ -127,7 +117,7 @@ class ItemControllerMvcTest {
     void updateItem() throws Exception {
         Item oldItem = new Item(1L, "old", "oldDesc", Status.AVAILABLE, owner, request1);
 
-        when(itemService.updateItem(anyLong(),anyLong(),anyString(),anyString(), any())).thenReturn(oldItem);
+        when(itemService.updateItem(anyLong(), anyLong(), anyString(), anyString(), any())).thenReturn(oldItem);
         ItemOutcomeDto itemOutcomeDto = ItemMapper.toItemDto(oldItem);
 
         String result = mockMvc.perform(patch("/items/1")
@@ -140,7 +130,7 @@ class ItemControllerMvcTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertEquals(objectMapper.writeValueAsString(itemOutcomeDto),result);
+        assertEquals(objectMapper.writeValueAsString(itemOutcomeDto), result);
     }
 
     @Test
@@ -154,7 +144,7 @@ class ItemControllerMvcTest {
     @Test
     @DisplayName("Запрос на добавление итема")
     void add() throws Exception {
-        when(itemService.addNewItem(anyLong(), anyString(), anyString(),any(),anyLong())).thenReturn(item1);
+        when(itemService.addNewItem(anyLong(), anyString(), anyString(), any(), anyLong())).thenReturn(item1);
         ItemOutcomeDto itemOutcomeDto = ItemMapper.toItemDto(item1);
         String result = mockMvc.perform(post("/items")
                         .header("X-Sharer-User-Id", 2L)
@@ -210,7 +200,7 @@ class ItemControllerMvcTest {
     @DisplayName("Удаление вещи")
     void deleteItemTest() throws Exception {
         mockMvc.perform(delete("/items/1")
-                                .header("X-Sharer-User-Id", 1))
+                        .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk());
     }
 
@@ -219,7 +209,7 @@ class ItemControllerMvcTest {
     void searchItem() throws Exception {
         List<Item> itemList = List.of(item1);
         List<ItemOutcomeDto> dtoList = List.of(ItemMapper.toItemDto(item1));
-        when(itemService.getItemsByDescription(anyString(), anyInt(),anyInt())).thenReturn(itemList);
+        when(itemService.getItemsByDescription(anyString(), anyInt(), anyInt())).thenReturn(itemList);
 
         String result = mockMvc.perform(MockMvcRequestBuilders.get("/items/search")
                         .header("X-Sharer-User-Id", 1L)
@@ -248,7 +238,7 @@ class ItemControllerMvcTest {
     @Test
     @DisplayName("Добавление комментария")
     void addComment() throws Exception {
-        when(commentService.addComment(anyLong(),anyLong(),anyString())).thenReturn(comment1);
+        when(commentService.addComment(anyLong(), anyLong(), anyString())).thenReturn(comment1);
         CommentDto commentDto = CommentMapper.toCommentDto(comment1);
 
         String result = mockMvc.perform(post("/items/{itemId}/comment", 1L)

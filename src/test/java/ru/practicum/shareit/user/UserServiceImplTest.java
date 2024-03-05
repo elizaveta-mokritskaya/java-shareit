@@ -28,10 +28,8 @@ class UserServiceImplTest {
     UserRepository mockUserRepository;
     @Captor
     ArgumentCaptor<User> userCaptor;
-    private UserDto userToCheck1 = new UserDto(1L, "user1@mail.ru", "user1");
-    private UserDto userToCheck2 = new UserDto(2L, "user2@mail.ru", "user2");
-    private User validUser1 = new User(1L, "aa@mail.ru", "Aa");
-    private User validUser2 = new User(2L, "bb@mail.ru", "Bb");
+    private final User validUser1 = new User(1L, "aa@mail.ru", "Aa");
+    private final User validUser2 = new User(2L, "bb@mail.ru", "Bb");
 
     @Test
     @DisplayName("Показывает список всех пользователей Дто")

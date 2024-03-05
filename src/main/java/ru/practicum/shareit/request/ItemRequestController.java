@@ -37,9 +37,9 @@ public class ItemRequestController {
         return itemRequestService.getRequests(userId).stream()
                 .map(r -> {
                     List<ItemOutcomeDto> dtoList = itemService.findItemsByRequestId(r.getId()).stream()
-                            .map(ItemMapper :: toItemDto)
+                            .map(ItemMapper::toItemDto)
                             .collect(Collectors.toList());
-                    return ItemRequestMapper.toItemRequestDto2(r,dtoList);
+                    return ItemRequestMapper.toItemRequestDto2(r, dtoList);
                 })
                 .collect(Collectors.toList());
     }
@@ -52,10 +52,10 @@ public class ItemRequestController {
         if ((from < 0) || (size < 1)) {
             throw new ValidationException("Параметры запроса неверны");
         }
-        return itemRequestService.getAllRequests(userId, from/size, size).stream()
+        return itemRequestService.getAllRequests(userId, from / size, size).stream()
                 .map(r -> {
                     List<ItemOutcomeDto> dtoList = itemService.findItemsByRequestId(r.getId()).stream()
-                            .map(ItemMapper :: toItemDto)
+                            .map(ItemMapper::toItemDto)
                             .collect(Collectors.toList());
                     return ItemRequestMapper.toItemRequestDto2(r, dtoList);
                 })
@@ -67,8 +67,8 @@ public class ItemRequestController {
                                              @PathVariable("requestId") Long requestId) {
         log.info("Пользователь '{}' просит показать запрос '{}'", userId, requestId);
         List<ItemOutcomeDto> dtoList = itemService.findItemsByRequestId(requestId).stream()
-                .map(ItemMapper :: toItemDto)
+                .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
-        return ItemRequestMapper.toItemRequestDto2(itemRequestService.getRequestById(userId,requestId),dtoList);
+        return ItemRequestMapper.toItemRequestDto2(itemRequestService.getRequestById(userId, requestId), dtoList);
     }
- }
+}

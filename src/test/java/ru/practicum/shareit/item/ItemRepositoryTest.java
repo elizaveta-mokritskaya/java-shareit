@@ -32,8 +32,6 @@ class ItemRepositoryTest {
     private User booker;
     private User owner;
     private LocalDateTime created;
-    private LocalDateTime start;
-    private LocalDateTime end;
     private ItemRequest request1;
     private ItemRequest request2;
     private Item item1;
@@ -51,8 +49,6 @@ class ItemRepositoryTest {
                 .build();
 
         created = LocalDateTime.now();
-        start = LocalDateTime.now().plusHours(1);
-        end = LocalDateTime.now().plusDays(10);
         request1 = ItemRequest.builder()
                 .description("request1")
                 .requestor(booker)

@@ -131,7 +131,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             default:
                 bookings = repository.findAllByBookerId(userId,
-                        PageRequest.of(from,size, sort))
+                                PageRequest.of(from, size, sort))
                         .getContent();
         }
         return bookings;
@@ -162,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             default:
                 bookings = repository.findAllByOwnerId(userId,
-                        PageRequest.of(from,size, sort))
+                                PageRequest.of(from, size, sort))
                         .getContent();
         }
         return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());

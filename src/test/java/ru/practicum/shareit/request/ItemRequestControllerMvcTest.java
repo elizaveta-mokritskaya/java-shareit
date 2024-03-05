@@ -38,7 +38,6 @@ class ItemRequestControllerMvcTest {
     private ItemRequest request1 = new ItemRequest(1L, "запрос1", userToCheck1, created);
     private ItemRequest request2 = new ItemRequest(2L, "запрос2", userToCheck1, created);
     private ItemRequest request3 = new ItemRequest(3L, "запрос3", userToCheck2, created);
-    private ItemRequest request4 = new ItemRequest(4L, "запрос4", userToCheck2, created);
 
     @Test
     @DisplayName("Возвращает ItemRequestDto")

@@ -18,7 +18,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Status;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,8 +40,6 @@ class ItemControllerTest {
 
     private User booker;
     private User owner;
-    private UserDto bookerDto;
-    private UserDto ownerDto;
     private LocalDateTime created;
     private LocalDateTime start;
     private LocalDateTime end;
@@ -57,8 +54,6 @@ class ItemControllerTest {
     void setUp() {
         booker = new User(1L, "user1@mail.ru", "user1");
         owner = new User(2L, "user2@mail.ru", "user2");
-        bookerDto = new UserDto(1L, "user1@mail.ru", "user1");
-        ownerDto = new UserDto(2L, "user2@mail.ru", "user2");
         created = LocalDateTime.now();
         start = LocalDateTime.now();
         end = LocalDateTime.now().plusDays(1);
@@ -96,7 +91,7 @@ class ItemControllerTest {
     @Test
     @DisplayName("Добавление вещи успешное")
     void add() {
-        when(itemService.addNewItem(anyLong(),anyString(),anyString(),any(),anyLong())).thenReturn(item1);
+        when(itemService.addNewItem(anyLong(), anyString(), anyString(), any(), anyLong())).thenReturn(item1);
         ItemOutcomeDto itemOutcomeDto = ItemMapper.toItemDto(item1);
 
         ItemOutcomeDto result = itemController.add(2L, itemIncomeDto);
@@ -112,7 +107,7 @@ class ItemControllerTest {
         List<Booking> bookingList = List.of(booking1);
         when(itemService.getItemById(anyLong(), anyLong())).thenReturn(item1);
         when(commentService.getComments(item1.getId())).thenReturn(commentList);
-        when(itemService.userIsOwnerOfItem(anyLong(),anyLong())).thenReturn(true);
+        when(itemService.userIsOwnerOfItem(anyLong(), anyLong())).thenReturn(true);
         when(bookingService.getBookingsForUser(anyLong())).thenReturn(bookingList);
         ItemOutcomeInfoDto infoDto = ItemMapper.toItemInfoDto(item1, bookingList, commentDtoList);
 
@@ -146,7 +141,7 @@ class ItemControllerTest {
     @DisplayName("Запрос на добавление комментария")
     void addComment() {
         CommentDto commentDto = CommentMapper.toCommentDto(comment1);
-        when(commentService.addComment(anyLong(),anyLong(), anyString())).thenReturn(comment1);
+        when(commentService.addComment(anyLong(), anyLong(), anyString())).thenReturn(comment1);
 
         CommentDto result = itemController.addComment(2L, 1L, commentDto);
 

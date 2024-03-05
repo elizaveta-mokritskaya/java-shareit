@@ -41,8 +41,6 @@ class ItemRequestControllerTest {
     private LocalDateTime created = LocalDateTime.of(2024, 2, 29, 12, 0, 0);
     private ItemRequest request1 = new ItemRequest(1L, "запрос1", validUser1, created);
     private ItemRequest request2 = new ItemRequest(2L, "запрос2", validUser1, created);
-    private ItemRequest request3 = new ItemRequest(3L, "запрос3", validUser2, created);
-    private ItemRequest request4 = new ItemRequest(4L, "запрос4", validUser2, created);
 
     @Test
     @DisplayName("Вызывается сервис")

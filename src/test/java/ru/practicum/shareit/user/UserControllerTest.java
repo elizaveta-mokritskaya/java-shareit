@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -22,10 +24,8 @@ class UserControllerTest {
     UserController userController;
     @Mock
     UserService mockUserService;
-    private User userToCheck1 = new User(1L, "user1@mail.ru", "user1");
-    private User userToCheck2 = new User(2L, "user2@mail.ru", "user2");
-    @Captor
-    ArgumentCaptor<User> userArgumentCaptor;
+    private final User userToCheck1 = new User(1L, "user1@mail.ru", "user1");
+    private final User userToCheck2 = new User(2L, "user2@mail.ru", "user2");
 
 
     @Test

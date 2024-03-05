@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.dto;
+package ru.practicum.shareit.item.dto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,16 +12,15 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-class BookingIncomeDtoTest {
+class CommentDtoTest {
     @Autowired
-    private JacksonTester<BookingIncomeDto> jacksonTester;
+    private JacksonTester<CommentDto> jacksonTester;
 
     @Test
     @DisplayName("Проверка корректности сериализации даты в JSON")
-    void bookingIncomeDtoTest() throws Exception {
-        BookingIncomeDto bookingDto = new BookingIncomeDto(1L, LocalDateTime.now(), LocalDateTime.now().plusHours(8), 1L);
-        JsonContent<BookingIncomeDto> result = jacksonTester.write(bookingDto);
-        assertThat(result).hasJsonPath("$.start");
-        assertThat(result).hasJsonPath("$.end");
+    void commentDtoTest() throws Exception {
+        CommentDto commentDto = new CommentDto(1L, "comment1", "autor", LocalDateTime.now());
+        JsonContent<CommentDto> result = jacksonTester.write(commentDto);
+        assertThat(result).hasJsonPath("$.created");
     }
 }
