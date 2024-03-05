@@ -122,14 +122,34 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Удаление")
     void deleteItem() {
+        itemController.deleteItem(2L, 1L);
+
+        verify(itemService).deleteItem(2L, 1L);
     }
 
     @Test
+    @DisplayName("Получен запрос на поиск итема по содержанию текста")
     void searchItem() {
+        int from = -1;
+        int size = 0;
+        String text = "description1";
+
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> itemController.searchItem(1L, text, from, size));
+
+        Assertions.assertEquals("Параметры запроса неверны", exception.getMessage());
     }
 
     @Test
+    @DisplayName("Запрос на добавление комментария")
     void addComment() {
+        CommentDto commentDto = CommentMapper.toCommentDto(comment1);
+        when(commentService.addComment(anyLong(),anyLong(), anyString())).thenReturn(comment1);
+
+        CommentDto result = itemController.addComment(2L, 1L, commentDto);
+
+        assertEquals(commentDto, result);
     }
 }
