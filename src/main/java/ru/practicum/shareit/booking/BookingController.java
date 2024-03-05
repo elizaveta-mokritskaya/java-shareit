@@ -58,7 +58,7 @@ public class BookingController {
         if ((from < 0) || (size < 1)) {
             throw new ValidationException("Неверные параметры запроса");
         }
-        return bookingService.getBookingsByUser(userId, state, from/size, size).stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        return bookingService.getBookingsByUser(userId, state, from / size, size).stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
     @GetMapping("/owner")
@@ -77,6 +77,6 @@ public class BookingController {
         if ((from < 0) || (size < 1)) {
             throw new ValidationException("Неверные параметры запроса");
         }
-        return bookingService.getBookingsByOwner(userId, state, from/size, size);
+        return bookingService.getBookingsByOwner(userId, state, from / size, size);
     }
 }

@@ -45,7 +45,7 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Корректное сохранение пользователя")
     void addUser_whenUserValid_thenSaveUser() {
-        User user = new User(3l, "new@mail.ru", "new");
+        User user = new User(3L, "new@mail.ru", "new");
         UserDto userDto = UserMapper.toUserDto(user);
         when(mockUserRepository.save(any())).thenReturn(user);
 

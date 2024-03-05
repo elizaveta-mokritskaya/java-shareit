@@ -13,15 +13,12 @@ import ru.practicum.shareit.booking.dto.SearchStatus;
 import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Status;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,8 +40,6 @@ class BookingServiceImplIntegrationTest {
 
     private User booker;
     private User owner;
-    private UserDto bookerDto;
-    private UserDto ownerDto;
     private LocalDateTime created;
     private LocalDateTime start;
     private LocalDateTime end;
@@ -69,8 +64,6 @@ class BookingServiceImplIntegrationTest {
                 .email("user2@mail.ru")
                 .build();
 
-        bookerDto = new UserDto(1L, "user1@mail.ru", "user1");
-        ownerDto = new UserDto(2L, "user2@mail.ru", "user2");
         created = LocalDateTime.now();
         start = LocalDateTime.now().plusHours(1);
         end = LocalDateTime.now().plusDays(10);
