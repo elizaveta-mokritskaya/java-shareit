@@ -57,6 +57,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public Item updateItem(Long userId, Long itemId, String itemName, String description, Boolean available) {
         Item updateItem = repository.getById(itemId);
         if (updateItem == null) {
