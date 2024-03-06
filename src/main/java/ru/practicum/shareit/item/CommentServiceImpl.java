@@ -12,6 +12,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.time.LocalDateTime;
@@ -38,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment addComment(Long userId, long itemId, String text) {
-        User user = UserMapper.toUser(userService.getUserById(userId));
+        UserDto user = userService.getUserById(userId);
         if (user == null) {
             throw new DataNotFoundException("Владелец вещи не найден");
         }
@@ -49,12 +50,13 @@ public class CommentServiceImpl implements CommentService {
         if (item == null) {
             throw new DataNotFoundException("Вещь с таким id не найдена");
         }
-        Booking booking = bookingService.getBookingsByUser(userId, SearchStatus.PAST)
+        Booking booking = bookingService.getBookingsByUser(userId, SearchStatus.PAST, 0, 0)
                 .stream()
                 .filter(b -> b.getItem().getId() == itemId)
                 .findAny().orElseThrow(() -> new ValidationException("Бронь не найдена"));
+        User user1 = UserMapper.toUser(user);
         return repository.save(new Comment(
-                null, text, item, user, LocalDateTime.now()
+                null, text, item, user1, LocalDateTime.now()
         ));
     }
 }

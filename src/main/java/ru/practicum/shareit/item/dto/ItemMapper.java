@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Status;
@@ -36,9 +37,9 @@ public class ItemMapper {
         Booking bookingNext = bookings.stream()
                 .filter(b -> ((b.getStart().isAfter(LocalDateTime.now()))
                         &&
-                        (!b.getStatus().equals(ru.practicum.shareit.booking.Status.REJECTED))
+                        (!b.getBookingStatus().equals(BookingStatus.REJECTED))
                         &&
-                        (!b.getStatus().equals(ru.practicum.shareit.booking.Status.CANCELED))))
+                        (!b.getBookingStatus().equals(BookingStatus.CANCELED))))
                 .min(Comparator.comparing(Booking::getStart)).orElse(null);
         return new ItemOutcomeInfoDto(
                 item.getId(),

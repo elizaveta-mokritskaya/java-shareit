@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,7 +13,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * ALL
      */
     @Query("select b from Booking as b where b.item.owner.id = :userId order by b.start desc ")
-    List<Booking> findAllByOwnerId(Long userId);
+    Page<Booking> findAllByOwnerId(Long userId, Pageable pageable);
 
     /**
      * PAST booking
@@ -37,9 +39,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     /**
      * WAITING ожид.подтв. REJECTED отклонён
      */
-    @Query("select b from Booking as b where b.item.owner.id = :userId and b.status = :status " +
+    @Query("select b from Booking as b where b.item.owner.id = :userId and b.bookingStatus = :bookingStatus " +
             "order by b.start desc ")
-    List<Booking> getBookingByOwner_IdAndStatus(Long userId, Status status);
+    List<Booking> getBookingByOwner_IdAndStatus(Long userId, BookingStatus bookingStatus);
 
     @Query("select b from Booking as b where b.item.id = :itemId ")
     List<Booking> findAllByItemId(Long itemId);
@@ -57,10 +59,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> getBookingForBookerIdAndStartAfter(Long userId, LocalDateTime date);
 
     @Query("select b from Booking as b where b.booker.id = :userId order by b.start desc ")
-    List<Booking> findAllByBookerId(Long userId);
+    Page<Booking> findAllByBookerId(Long userId, Pageable pageable);
 
-    @Query("select b from Booking as b where b.booker.id = :userId and b.status = :status " +
+    @Query("select b from Booking as b where b.booker.id = :userId and b.bookingStatus = :bookingStatus " +
             "order by b.start desc ")
-    List<Booking> getBookingForBookerAndStatus(Long userId, Status status);
+    List<Booking> getBookingForBookerAndStatus(Long userId, BookingStatus bookingStatus);
 }
 
