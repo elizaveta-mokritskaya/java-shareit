@@ -86,7 +86,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Вызов сервиса при обновлении")
     void updateUserTest() {
-        UserDto userDto = new UserDto(null, "user3@mail.ru", "user3");
+        UserDto userDto = new UserDto(3L, "user3@mail.ru", "user3");
         User user = new User(3L, "user3@mail.ru", "user3");
         Mockito.when(mockUserService.updateUser(anyLong(), any())).thenReturn(UserMapper.toUserDto(user));
 

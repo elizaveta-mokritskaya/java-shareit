@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -23,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto addNewUser(@Valid @RequestBody UserDto userDto) {
+    public UserDto addNewUser(@RequestBody UserDto userDto) {
         log.info("Получен запрос на добавление нового пользователя '{}'", userDto);
         return userService.addUser(
                 userDto.getId(),
@@ -35,9 +34,6 @@ public class UserController {
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable("userId") Long userId, @RequestBody UserDto userDto) {
         log.info("Получен запрос на обновление данных пользователя '{}'", userId);
-        if (userDto.getId() == null) {
-            userDto.setId(userId);
-        }
         return userService.updateUser(userId, UserMapper.toUser(userDto));
     }
 

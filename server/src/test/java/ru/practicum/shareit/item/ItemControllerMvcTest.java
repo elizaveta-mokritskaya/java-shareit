@@ -225,17 +225,6 @@ class ItemControllerMvcTest {
     }
 
     @Test
-    @DisplayName("Ошибка при получении запрос на поиск итема")
-    void searchItem_badRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/items/search")
-                        .header("X-Sharer-User-Id", 1L)
-                        .param("text", "description1")
-                        .param("from", "-3")
-                        .param("size", "-10"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     @DisplayName("Добавление комментария")
     void addComment() throws Exception {
         when(commentService.addComment(anyLong(), anyLong(), anyString())).thenReturn(comment1);

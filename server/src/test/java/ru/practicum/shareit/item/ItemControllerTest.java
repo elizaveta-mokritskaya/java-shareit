@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -66,18 +64,6 @@ class ItemControllerTest {
     }
 
     @Test
-    @DisplayName("Неверные параметры запроса GET")
-    void get_isNotSuccess() {
-        int from = -1;
-        int size = 0;
-
-        ValidationException exception = Assertions.assertThrows(ValidationException.class,
-                () -> itemController.get(1L, from, size));
-
-        assertEquals("Параметры запроса неверны", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("Успешное обновление данных вещи")
     void updateItem_thenUseServiceAndShouldReturnItemOutcomeDto() {
         when(itemService.updateItem(anyLong(), anyLong(), anyString(), anyString(), any())).thenReturn(item1).thenReturn(item1);
@@ -122,19 +108,6 @@ class ItemControllerTest {
         itemController.deleteItem(2L, 1L);
 
         verify(itemService).deleteItem(2L, 1L);
-    }
-
-    @Test
-    @DisplayName("Получен запрос на поиск итема по содержанию текста")
-    void searchItem() {
-        int from = -1;
-        int size = 0;
-        String text = "description1";
-
-        ValidationException exception = Assertions.assertThrows(ValidationException.class,
-                () -> itemController.searchItem(1L, text, from, size));
-
-        Assertions.assertEquals("Параметры запроса неверны", exception.getMessage());
     }
 
     @Test

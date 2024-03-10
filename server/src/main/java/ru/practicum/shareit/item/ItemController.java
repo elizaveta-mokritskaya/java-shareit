@@ -5,12 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingService;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +26,6 @@ public class ItemController {
                                         @RequestParam(name = "from", defaultValue = "0") int from,
                                         @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен запрос - показать список вещей пользователя '{}'", userId);
-        if ((from < 0) || (size < 1)) {
-            throw new ValidationException("Параметры запроса неверны");
-        }
         return itemService.getItemsToPage(userId, from / size, size).stream().map(
                         item -> {
                             List<Booking> bookingList = bookingService.getBookingsForUser(item.getId());
@@ -58,7 +53,7 @@ public class ItemController {
 
     @PostMapping
     public ItemOutcomeDto add(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @Valid @RequestBody ItemIncomeDto incomeDto) {
+                              @RequestBody ItemIncomeDto incomeDto) {
         log.info("Получен запрос на добавление итема '{}' пользователю '{}'", incomeDto, userId);
         return ItemMapper.toItemDto(itemService.addNewItem(
                 userId,
@@ -99,9 +94,6 @@ public class ItemController {
                                            @RequestParam(name = "from", defaultValue = "0") int from,
                                            @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен запрос на поиск итема по содержанию текста '{}' у пользователя '{}'", text, userId);
-        if ((from < 0) || (size < 1)) {
-            throw new ValidationException("Параметры запроса неверны");
-        }
         return itemService.getItemsByDescription(text, from / size, size).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -110,7 +102,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                  @PathVariable long itemId,
-                                 @Valid @RequestBody CommentDto commentDto) {
+                                 @RequestBody CommentDto commentDto) {
         return CommentMapper.toCommentDto(commentService.addComment(userId, itemId, commentDto.getText()));
     }
 }

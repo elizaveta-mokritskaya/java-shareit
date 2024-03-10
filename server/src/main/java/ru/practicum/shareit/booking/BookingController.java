@@ -7,7 +7,6 @@ import ru.practicum.shareit.booking.dto.BookingIncomeDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingOutcomeDto;
 import ru.practicum.shareit.booking.dto.SearchStatus;
-import ru.practicum.shareit.exception.ValidationException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -49,15 +48,7 @@ public class BookingController {
                                                      @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен запрос на получение " +
                 "списка бронирований пользователя с ID={} с параметром STATE={}", userId, stateParam);
-        SearchStatus state;
-        try {
-            state = SearchStatus.valueOf(stateParam);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
-        }
-        if ((from < 0) || (size < 1)) {
-            throw new ValidationException("Неверные параметры запроса");
-        }
+        SearchStatus state = SearchStatus.valueOf(stateParam);
         return bookingService.getBookingsByUser(userId, state, from / size, size).stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
@@ -68,15 +59,7 @@ public class BookingController {
                                                       @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен запрос на получение " +
                 "списка бронирований владельцем вещи с ID={} с параметром STATE={}", userId, stateParam);
-        SearchStatus state;
-        try {
-            state = SearchStatus.valueOf(stateParam);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
-        }
-        if ((from < 0) || (size < 1)) {
-            throw new ValidationException("Неверные параметры запроса");
-        }
+        SearchStatus state = SearchStatus.valueOf(stateParam);
         return bookingService.getBookingsByOwner(userId, state, from / size, size);
     }
 }

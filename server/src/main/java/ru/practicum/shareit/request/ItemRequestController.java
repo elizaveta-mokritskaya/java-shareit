@@ -3,7 +3,6 @@ package ru.practicum.shareit.request;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemOutcomeDto;
@@ -12,7 +11,6 @@ import ru.practicum.shareit.request.dto.ItemRequestIncomeDto;
 import ru.practicum.shareit.request.dto.ItemRequestInfoDto;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +24,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDto addRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                     @Valid @RequestBody ItemRequestIncomeDto dto) {
+                                     @RequestBody ItemRequestIncomeDto dto) {
         log.info("Получен запрос на добавление нового запроса '{}' пользователю '{}'", dto, userId);
         return ItemRequestMapper.toItemRequestDto(itemRequestService.addNewRequest(userId, dto.getDescription()));
     }
@@ -49,10 +47,7 @@ public class ItemRequestController {
                                                    @RequestParam(name = "from", defaultValue = "0") int from,
                                                    @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Пользователь '{}' просит показать список запросов других пользователей", userId);
-        if ((from < 0) || (size < 1)) {
-            throw new ValidationException("Параметры запроса неверны");
-        }
-        return itemRequestService.getAllRequests(userId, from / size, size).stream()
+                return itemRequestService.getAllRequests(userId, from / size, size).stream()
                 .map(r -> {
                     List<ItemOutcomeDto> dtoList = itemService.findItemsByRequestId(r.getId()).stream()
                             .map(ItemMapper::toItemDto)

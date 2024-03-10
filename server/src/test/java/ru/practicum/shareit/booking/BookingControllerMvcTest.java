@@ -177,35 +177,6 @@ class BookingControllerMvcTest {
     }
 
     @Test
-    @DisplayName("Неверный статус - Ошибка при получение списка бронирований по userId")
-    void getBookingsByUser_badRequest_becauseOfTheStatus() throws Exception {
-        List<Booking> bookingList = List.of(booking1, booking2);
-        when(bookingService.getBookingsByUser(1L, SearchStatus.ALL, 0, 10)).thenReturn(bookingList);
-
-        mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", 1L)
-                        .param("state", "UNSUPPORTED_STATUS")
-                        .param("from", "0")
-                        .param("size", "10"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Неверные параметры - Ошибка при получение списка бронирований по userId")
-    void getBookingsByUser_badRequest_becauseOfTheParam() throws Exception {
-        List<Booking> bookingList = List.of(booking1, booking2);
-        when(bookingService.getBookingsByUser(1L, SearchStatus.ALL, 0, 10)).thenReturn(bookingList);
-        List<BookingOutcomeDto> dtoList = bookingList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
-
-        mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", 1L)
-                        .param("state", "UNSUPPORTED_STATUS")
-                        .param("from", "-2")
-                        .param("size", "-5"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     @DisplayName("Получение списка бронирований по ownerId")
     void getBookingsByOwner() throws Exception {
         List<BookingOutcomeDto> dtoList = List.of(bookingOutcomeDto, bookingOutcomeDto2);
@@ -222,33 +193,5 @@ class BookingControllerMvcTest {
                 .getContentAsString();
 
         assertEquals(objectMapper.writeValueAsString(dtoList), result);
-    }
-
-    @Test
-    @DisplayName("Неверный статус - Получение списка бронирований по ownerId")
-    void getBookingsByOwner_badRequest_becauseOfTheStatus() throws Exception {
-        List<BookingOutcomeDto> dtoList = List.of(bookingOutcomeDto, bookingOutcomeDto2);
-        when(bookingService.getBookingsByOwner(1L, SearchStatus.ALL, 0, 10)).thenReturn(dtoList);
-
-        mockMvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", 1L)
-                        .param("state", "UNSUPPORTED_STATUS")
-                        .param("from", "0")
-                        .param("size", "10"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Неверные параметры - Получение списка бронирований по ownerId")
-    void getBookingsByOwner_badRequest_becauseOfTheParam() throws Exception {
-        List<BookingOutcomeDto> dtoList = List.of(bookingOutcomeDto, bookingOutcomeDto2);
-        when(bookingService.getBookingsByOwner(1L, SearchStatus.ALL, 0, 10)).thenReturn(dtoList);
-
-        mockMvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", 1L)
-                        .param("state", "ALL")
-                        .param("from", "-2")
-                        .param("size", "-5"))
-                .andExpect(status().isBadRequest());
     }
 }
